@@ -36,6 +36,73 @@ html {
   scroll-behavior: smooth;
 }
 
+/* ===== Scroll Reveal Animations ===== */
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+.reveal.reveal-left {
+  transform: translateX(-50px);
+}
+
+.reveal.reveal-right {
+  transform: translateX(50px);
+}
+
+.reveal.reveal-zoom {
+  transform: scale(0.92);
+}
+
+.reveal.reveal-visible {
+  opacity: 1;
+  transform: none;
+}
+
+/* Scroll progress bar */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 4px;
+  width: 0%;
+  background-color: var(--primary-color);
+  z-index: 1100;
+  transition: width 0.1s linear;
+}
+
+/* Animated entrance for the back-to-top button */
+.back-to-top {
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(20px);
+  transition: opacity 0.4s ease, transform 0.4s ease, visibility 0.4s ease;
+}
+
+.back-to-top.show {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .reveal,
+  .reveal.reveal-left,
+  .reveal.reveal-right,
+  .reveal.reveal-zoom {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
 body {
   font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   line-height: 1.6;
@@ -853,3 +920,70 @@ footer {
   }
 }
 
+
+/* ===== Electric Border di project cards ===== */
+:root {
+  --electric-border-color: #4a6cf7;
+  --electric-light-color: #a9bcff;
+}
+
+.electric-border-svg {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+.eb-layers {
+  position: absolute;
+  inset: 0;
+  border-radius: 10px;
+  pointer-events: none;
+  z-index: 6;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.project-card:hover .eb-layers {
+  opacity: 1;
+}
+
+.eb-layers > div {
+  position: absolute;
+  inset: 2px;
+  border-radius: 10px;
+}
+
+.eb-stroke {
+  border: 2px solid var(--electric-border-color);
+  filter: url(#turbulent-displace);
+}
+
+.eb-glow-1 {
+  border: 2px solid rgba(74, 108, 247, 0.6);
+  filter: blur(2px);
+}
+
+.eb-glow-2 {
+  border: 2px solid var(--electric-light-color);
+  filter: blur(5px);
+}
+
+.eb-bg-glow {
+  inset: 0;
+  filter: blur(24px);
+  opacity: 0.35;
+  background: linear-gradient(
+    -30deg,
+    var(--electric-light-color),
+    transparent 40%,
+    transparent 60%,
+    var(--electric-border-color)
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .eb-stroke {
+    filter: none;
+  }
+}
