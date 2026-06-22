@@ -122,7 +122,8 @@ filterBtns.forEach((btn) => {
 })
 
 // Form Submission
-contactForm.addEventListener("submit", (e) => {
+if (contactForm) {
+  contactForm.addEventListener("submit", (e) => {
   e.preventDefault()
 
   // Get form values
@@ -137,9 +138,10 @@ contactForm.addEventListener("submit", (e) => {
     alert("Thank you for your message! I will get back to you soon.")
     contactForm.reset()
   } else {
-    alert("Please fill in all fields.")
-  }
-})
+      alert("Please fill in all fields.")
+    }
+  })
+}
 
 // Initialize animations on page load
 window.addEventListener("load", () => {
@@ -149,6 +151,95 @@ window.addEventListener("load", () => {
   // Initial active nav link
   updateActiveNavLink()
 })
+
+// ===== Scroll Progress Bar =====
+const scrollProgress = document.createElement("div")
+scrollProgress.className = "scroll-progress"
+document.body.appendChild(scrollProgress)
+
+function updateScrollProgress() {
+  const scrollTop = window.scrollY
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight
+  const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0
+  scrollProgress.style.width = `${progress}%`
+}
+
+// ===== Back to Top button show/hide =====
+const backToTop = document.querySelector(".back-to-top")
+
+function updateBackToTop() {
+  if (!backToTop) return
+  if (window.scrollY > 400) {
+    backToTop.classList.add("show")
+  } else {
+    backToTop.classList.remove("show")
+  }
+}
+
+// Run progress + back-to-top on scroll (throttled with rAF)
+let ticking = false
+window.addEventListener("scroll", () => {
+  if (!ticking) {
+    window.requestAnimationFrame(() => {
+      updateScrollProgress()
+      updateBackToTop()
+      ticking = false
+    })
+    ticking = true
+  }
+})
+
+// ===== Scroll Reveal with IntersectionObserver =====
+function setupScrollReveal() {
+  // Define what gets animated and how
+  const revealConfig = [
+    { selector: ".section-title", variant: "" },
+    { selector: ".hero-content > *", variant: "reveal-left", stagger: true },
+    { selector: ".hero-image", variant: "reveal-right" },
+    { selector: ".about-image", variant: "reveal-left" },
+    { selector: ".about-text > p", variant: "", stagger: true },
+    { selector: ".detail", variant: "", stagger: true },
+    { selector: ".skill-category", variant: "", stagger: true },
+    { selector: ".skill-item", variant: "reveal-zoom", stagger: true },
+    { selector: ".project-card", variant: "", stagger: true },
+    { selector: ".contact-item", variant: "reveal-left", stagger: true },
+    { selector: ".contact-form", variant: "reveal-right" },
+    { selector: ".social-links", variant: "" },
+  ]
+
+  revealConfig.forEach(({ selector, variant, stagger }) => {
+    const elements = document.querySelectorAll(selector)
+    elements.forEach((el, index) => {
+      el.classList.add("reveal")
+      if (variant) el.classList.add(variant)
+      if (stagger) {
+        // Stagger items in groups of 4 so long lists don't delay too much
+        el.style.transitionDelay = `${(index % 4) * 0.1}s`
+      }
+    })
+  })
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("reveal-visible")
+          observer.unobserve(entry.target)
+        }
+      })
+    },
+    {
+      threshold: 0.15,
+      rootMargin: "0px 0px -50px 0px",
+    },
+  )
+
+  document.querySelectorAll(".reveal").forEach((el) => observer.observe(el))
+}
+
+setupScrollReveal()
+updateScrollProgress()
+updateBackToTop()
 
 // Smooth scrolling for anchor links
 document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
@@ -167,3 +258,21 @@ document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
   })
 })
 
+// ===== Electric Border di project cards =====
+function setupElectricBorders() {
+  const cards = document.querySelectorAll(".project-card")
+  cards.forEach((card) => {
+    if (card.querySelector(".eb-layers")) return
+    const layers = document.createElement("div")
+    layers.className = "eb-layers"
+    layers.setAttribute("aria-hidden", "true")
+    layers.innerHTML =
+      '<div class="eb-stroke"></div>' +
+      '<div class="eb-glow-1"></div>' +
+      '<div class="eb-glow-2"></div>' +
+      '<div class="eb-bg-glow"></div>'
+    card.appendChild(layers)
+  })
+}
+
+setupElectricBorders()
